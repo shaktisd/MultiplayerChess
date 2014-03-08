@@ -25,7 +25,7 @@ send404 = function(res){
 
 
 function serveStatic(response, cache, absPath) {
-	if (cache[absPath]) {
+	if (false) {
 		sendFile(response, absPath, cache[absPath]);
 	} else {
 		fs.exists(absPath, function(exists) {
@@ -34,7 +34,7 @@ function serveStatic(response, cache, absPath) {
 					if (err) {
 						send404(response);
 					} else {
-						cache[absPath] = data;
+						//cache[absPath] = data;
 						sendFile(response, absPath, data);
 					}
 				});
@@ -52,7 +52,7 @@ function sendFile(response, filePath, fileContents) {
 	response.end(fileContents);
 }
 
-var port = Number(process.env.PORT || 9091);
+var port = Number(9091);
 server.listen(port);
 
 // use socket.io
@@ -65,7 +65,7 @@ io.set('log level', 1);
 io.sockets.on('connection', function(socket) {
 	//recieve client data
 	socket.on('client_data', function(data) {
-		process.stdout.write('from: ' + data.from + ' to: ' + data.to + ' promotion: ' + data.promotion);
+		//process.stdout.write('from: ' + data.from + ' to: ' + data.to + ' promotion: ' + data.promotion);
 		socket.broadcast.emit('updated_move', {
 			'from' : data.from,
 			'to' : data.to,
