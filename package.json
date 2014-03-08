@@ -1,0 +1,16 @@
+{
+  "name": "MultiplayerChess",
+  "version": "0.0.0",
+  "description": "Multiplayer Chess Game",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "shakti",
+  "license": "ISC",
+  "dependencies": {
+    "path": "~0.4.9",
+    "mime": "~1.2.11"
+  }
+}
