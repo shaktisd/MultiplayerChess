@@ -52,8 +52,8 @@ function sendFile(response, filePath, fileContents) {
 	response.end(fileContents);
 }
 
-
-server.listen(9191);
+var port = Number(process.env.PORT || 9091);
+server.listen(port);
 
 // use socket.io
 var io = require('socket.io').listen(server);
