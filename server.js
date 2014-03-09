@@ -48,6 +48,7 @@ function serveStatic(response, cache, absPath) {
 function sendFile(response, filePath, fileContents) {
 	response.writeHead(200, {
 		"content-type" : mime.lookup(path.basename(filePath))
+		,"Cache-Control" : "max-age=604800"
 	});
 	response.end(fileContents);
 }
@@ -55,6 +56,7 @@ function sendFile(response, filePath, fileContents) {
 
 var port = Number(process.env.PORT || 9091);
 server.listen(port);
+console.log("Running server on port " + port)
 
 // use socket.io
 var io = require('socket.io').listen(server);
