@@ -3,8 +3,10 @@ var http = require('http');
 var fs = require('fs');
 var path = require('path');
 var mime = require('mime');
+
 var server;
 var cache = {};
+var roomlist = {};
 
 server = http.createServer(function(request, response){
     if (request.url == '/') {
@@ -56,7 +58,7 @@ function sendFile(response, filePath, fileContents) {
 
 var port = Number(process.env.PORT || 9091);
 server.listen(port);
-console.log("Running server on port " + port)
+console.log("Running server on port " + port);
 
 // use socket.io
 var io = require('socket.io').listen(server);
@@ -66,13 +68,21 @@ io.set('log level', 1);
 
 // define interactions with client
 io.sockets.on('connection', function(socket) {
+	// once a client has connected, we expect to get a ping from them saying what room they want to join
+    socket.on('join', function(data) {
+    	console.log("######## Request from client " + socket.id + " to join room "  + data.room + " color " + data.color);
+        socket.join(data.room);
+        roomlist[socket.id] = data.room;
+        console.log("######## Client " + socket.id + " Joined  "  + data.room + " color " + data.color);
+    });
 	//recieve client data
 	socket.on('client_data', function(data) {
-		//process.stdout.write('from: ' + data.from + ' to: ' + data.to + ' promotion: ' + data.promotion);
-		socket.broadcast.emit('updated_move', {
+		console.log('client_data received ' + 'from: ' + data.from + ' to: ' + data.to + ' promotion: ' + data.promotion + '\n');
+		socket.broadcast.to(roomlist[socket.id]).emit('updated_move', {
 			'from' : data.from,
 			'to' : data.to,
 			'promotion' : 'q' // NOTE: always promote to a queen for example simplicity
 		});
+		console.log('updated_move sent from ' + socket.id  + 'to room ' + roomlist[socket.id] + '\n');
 	});
 });

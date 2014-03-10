@@ -21,6 +21,14 @@
 <p>Status: <span id="status"></span></p>
 <p>FEN: <span id="fen"></span></p>
 <p>PGN: <span id="pgn"></span></p>
+<p>ROOM: <span id="room"></span></p>
+<form id='join-room-form'>
+    <input id='join-room' />
+    <label> <input type='radio' id='whiteradio' name='radioGroup' value='w'> White </label>
+	<label> <input type='radio' id='blackradio' name='radioGroup' value='b'> Black </label>
+    <input id='join-room-button' type='submit' value='Join Room'/>
+</form>
+
 <!-- end example HTML --->
 
 
@@ -34,22 +42,24 @@ var board,
   statusEl = $('#status'),
   fenEl = $('#fen'),
   pgnEl = $('#pgn');
+  roomE1 = $('#room');
+  playwithcolor = 'w';
+  
   
 var socket = io.connect();
+//take chessroom from user
 
 socket.on('updated_move', function(data){
-/* 	fenEl.html(data.fen);
-	game.load(data.fen);
+	console.log("Received updated move ");
+	var move = game.move({
+	    'from' : data.from,
+	    'to' : data.to,
+	    'promotion' : 'q' // NOTE: always promote to a queen for example simplicity
+	  });
+	console.log('Turn ' + game.turn() + ' Orientation ' + board.orientation());
+	board.position(game.fen());
 	updateStatus();
- */  
-var move = game.move({
-    'from' : data.from,
-    'to' : data.to,
-    'promotion' : 'q' // NOTE: always promote to a queen for example simplicity
-  });
-board.position(game.fen());
-updateStatus();
- 
+	
  });
 // do not pick up pieces if the game is over
 // only pick up pieces for the side to move
@@ -71,8 +81,10 @@ var onDrop = function(source, target) {
 
   // illegal move
   if (move === null) return 'snapback';
+  
   $(document).ready(function(){
-  	socket.emit('client_data', {
+	  console.log('client_data from ' + socket.id + ' from ' + source + ' to ' + target + ' promotion ' + 'q');
+	  socket.emit('client_data', {
   	    from: source,
   	    to: target,
   	    promotion: 'q' // NOTE: always promote to a queen for example simplicity
@@ -133,10 +145,37 @@ var cfg = {
 board = new ChessBoard('board', cfg);
 
 updateStatus();
-//--- end example JS ---
 
-}; // end init()
-$(document).ready(init);
+
+
+function processUserInput(socket) {
+		var room = $('#join-room').val();
+		var chesscolor = 'x';
+		if ($("#whiteradio").prop("checked")) {
+			   chesscolor = 'white';
+		}else if ($("#blackradio").prop("checked")){
+				chesscolor = 'black';
+		}
+		
+		if (board.orientation() != chesscolor){
+			board.flip();
+		}
+		
+		console.log('Sending message to join room ' + room + ' color ' + chesscolor);
+		socket.emit('join', { 'room' : room , 'color' : chesscolor});
+		roomE1.html($('#join-room').val());
+		$('#join-room').val('');
+	}
+
+$('#join-room-form').submit(function() {
+	processUserInput(socket);
+	return false;
+});
+
+		//--- end example JS ---
+
+	}; // end init()
+	$(document).ready(init);
 </script>
 </body>
 </html>
