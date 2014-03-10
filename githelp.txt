@@ -13,3 +13,4 @@ git push -u origin master
 
 heroku
 https://devcenter.heroku.com/articles/getting-started-with-nodejs
+git push heroku master

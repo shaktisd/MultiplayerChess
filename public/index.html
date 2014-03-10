@@ -66,7 +66,10 @@ socket.on('updated_move', function(data){
 var onDragStart = function(source, piece, position, orientation) {
   if (game.game_over() === true ||
       (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-      (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+      (game.turn() === 'b' && piece.search(/^w/) !== -1) || 
+      (game.turn() === 'w' && playwithcolor === 'black') ||
+  	  (game.turn() === 'b' && playwithcolor === 'white')    
+  ) {
     return false;
   }
 };
@@ -156,6 +159,8 @@ function processUserInput(socket) {
 		}else if ($("#blackradio").prop("checked")){
 				chesscolor = 'black';
 		}
+		
+		playwithcolor = chesscolor;
 		
 		if (board.orientation() != chesscolor){
 			board.flip();
