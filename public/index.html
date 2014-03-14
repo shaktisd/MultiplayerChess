@@ -77,17 +77,24 @@ socket.on('updated_move', function(data){
 	  });
 	//var history = game.history({ verbose: true });
 	//console.log(history);
-	//console.log('Turn ' + game.turn() + ' Orientation ' + board.orientation());
-	// highlight black's move
   removeHighlights('black');
   removeHighlights('white');
   boardEl.find('.square-' + move.from).addClass('highlight-black');
   squareToHighlight = move.to;
 	board.position(game.fen());
 	updateStatus();
-	
-	
  });
+ 
+socket.on('join_pgn', function(data){
+	console.log("Received join_pgn " + data);
+	game.load_pgn(data.pgn);
+	board.position(game.fen());
+	updateStatus();
+ });
+
+ 
+ 
+ 
 // do not pick up pieces if the game is over
 // only pick up pieces for the side to move
 var onDragStart = function(source, piece, position, orientation) {
@@ -111,11 +118,12 @@ var onDrop = function(source, target) {
   // illegal move
   if (move === null) return 'snapback';
   $(document).ready(function(){
-	  console.log('client_data from ' + socket.id + ' from ' + source + ' to ' + target + ' promotion ' + 'q');
+	  console.log('client_data from ' + socket.id + ' from ' + source + ' to ' + target + ' promotion ' + 'q' + ' pgn ' + game.pgn());
 	  socket.emit('client_data', {
   	    from: source,
   	    to: target,
-  	    promotion: 'q' // NOTE: always promote to a queen for example simplicity
+  	    promotion: 'q', // NOTE: always promote to a queen for example simplicity
+  	    pgn: game.pgn()
   	  });
   });
   // highlight white's move
@@ -136,9 +144,6 @@ var onMoveEnd = function() {
 // for castling, en passant, pawn promotion
 var onSnapEnd = function() {
   board.position(game.fen());
-  /* $(document).ready(function(){
-	  socket.emit('client_data', {'letter': game.fen()});
-  }); */
 };
 
 var updateStatus = function() {
@@ -207,7 +212,7 @@ function processUserInput(socket) {
 		}
 		
 		console.log('Sending message to join room ' + room + ' color ' + chesscolor);
-		socket.emit('join', { 'room' : room , 'color' : chesscolor});
+		socket.emit('join', { 'room' : room , 'color' : chesscolor });
 		roomE1.html($('#join-room').val());
 		$('#join-room').val('');
 	}

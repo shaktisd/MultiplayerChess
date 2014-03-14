@@ -7,6 +7,7 @@ var mime = require('mime');
 var server;
 var cache = {};
 var roomlist = {};
+var roompgn = {};
 
 server = http.createServer(function(request, response){
     if (request.url == '/') {
@@ -73,16 +74,20 @@ io.sockets.on('connection', function(socket) {
     	console.log("######## Request from client " + socket.id + " to join room "  + data.room + " color " + data.color);
         socket.join(data.room);
         roomlist[socket.id] = data.room;
+        socket.emit('join_pgn',{'pgn' : roompgn[data.room]});
         console.log("######## Client " + socket.id + " Joined  "  + data.room + " color " + data.color);
+        
+        
     });
 	//recieve client data
 	socket.on('client_data', function(data) {
-		console.log('client_data received ' + 'from: ' + data.from + ' to: ' + data.to + ' promotion: ' + data.promotion + '\n');
+		console.log('client_data received ' + 'from: ' + data.from + ' to: ' + data.to + ' promotion: ' + data.promotion +  ' pgn ' + data.pgn + '\n');
 		socket.broadcast.to(roomlist[socket.id]).emit('updated_move', {
 			'from' : data.from,
 			'to' : data.to,
 			'promotion' : 'q' // NOTE: always promote to a queen for example simplicity
 		});
+		roompgn[roomlist[socket.id]] = data.pgn;
 		console.log('updated_move sent from ' + socket.id  + 'to room ' + roomlist[socket.id] + '\n');
 	});
 });

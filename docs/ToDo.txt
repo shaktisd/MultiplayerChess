@@ -1,0 +1,3 @@
+0. If someone joins the game in between , bring the game state . - DONE
+1. show captured pieces
+2. integrate with stockfish
