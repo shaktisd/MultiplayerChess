@@ -90,4 +90,10 @@ io.sockets.on('connection', function(socket) {
 		roompgn[roomlist[socket.id]] = data.pgn;
 		console.log('updated_move sent from ' + socket.id  + 'to room ' + roomlist[socket.id] + '\n');
 	});
+	
+	// receive move data
+	socket.on('move_score_data', function(data){
+		console.log('move_score_data received socket.id ' + socket.id  + ' data.fen ' + data.fen + ' data.score ' + data.score);
+	});
+	
 });

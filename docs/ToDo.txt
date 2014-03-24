@@ -1,3 +1,6 @@
 0. If someone joins the game in between , bring the game state . - DONE
 1. show captured pieces
 2. integrate with stockfish
+3. Add analyze mode - can use some features of http://bmarini.github.io/jchess/
+4. 
+
